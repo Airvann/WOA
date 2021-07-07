@@ -1,0 +1,11 @@
+C:\Users\Admin\Documents\GitHub\WOA\AIS\bin\Debug\WOA.exe.config
+C:\Users\Admin\Documents\GitHub\WOA\AIS\bin\Debug\WOA.exe
+C:\Users\Admin\Documents\GitHub\WOA\AIS\bin\Debug\WOA.pdb
+C:\Users\Admin\Documents\GitHub\WOA\AIS\obj\Debug\WOA.FormStepByStep.resources
+C:\Users\Admin\Documents\GitHub\WOA\AIS\obj\Debug\WOA.FormMain.resources
+C:\Users\Admin\Documents\GitHub\WOA\AIS\obj\Debug\WOA.Properties.Resources.resources
+C:\Users\Admin\Documents\GitHub\WOA\AIS\obj\Debug\WOA.csproj.GenerateResource.cache
+C:\Users\Admin\Documents\GitHub\WOA\AIS\obj\Debug\WOA.csproj.CoreCompileInputs.cache
+C:\Users\Admin\Documents\GitHub\WOA\AIS\obj\Debug\WOA.exe
+C:\Users\Admin\Documents\GitHub\WOA\AIS\obj\Debug\WOA.pdb
+C:\Users\Admin\Documents\GitHub\WOA\AIS\obj\Debug\WOA.csprojAssemblyReference.cache

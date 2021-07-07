@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace GWO
+namespace WOA
 {
     //Тип параметра а: линейная или квадратичная функция
     public enum Params
@@ -35,10 +35,9 @@ namespace GWO
         public int currentIteration = 0;
 
         //3 наиболее приспособленные особи
-        public Wolf alfa = new Wolf();  //Альфа-особь
-        public Wolf beta = new Wolf();  //Бета-особь
-        public Wolf delta = new Wolf(); //Дельта-особь
-
+        public Whale best = new Whale();  //Альфа-особь
+        public Vector A_individual = new Vector();
+        public Vector C_individual = new Vector();
         //Массив средней приспособленности
         public List<double> averageFitness = new List<double>();
 
@@ -48,16 +47,11 @@ namespace GWO
         //Параметр а
         private double a;
 
-        private Vector A_alfa = new Vector();
-        private Vector A_beta = new Vector();
-        private Vector A_delta = new Vector();
-
-        private Vector C_alfa  = new Vector();
-        private Vector C_beta  = new Vector();
-        private Vector C_delta = new Vector();
+        //Параметр логарифмический спирали
+        public double b = 1;
 
         //Популяция волков
-        public List<Wolf> individuals = new List<Wolf>();
+        public List<Whale> individuals = new List<Whale>();
 
         //Конструктор по умолчанию
         public Algoritm(){}
@@ -73,18 +67,15 @@ namespace GWO
                 x = (Math.Abs(D[0, 0]) + Math.Abs(D[0, 1])) * x - Math.Abs(D[0, 0]);
                 y = (Math.Abs(D[1, 0]) + Math.Abs(D[1, 1])) * y - Math.Abs(D[1, 0]);
 
-                Wolf wolf = new Wolf(x, y, function(x, y, f));
-                individuals.Add(wolf);
+                Whale Whale = new Whale(x, y, function(x, y, f));
+                individuals.Add(Whale);
             }
         }
         public void Selection()
         {
             individuals = individuals.OrderByDescending(s => s.fitness).ToList();
-
-            //Выбираем наиболее приспосоленных волков (сделано так, чтобы была передача значений, а не ссылки) 
-            alfa.coords.vector[0] = individuals[0].coords.vector[0];    alfa.coords.vector[1] = individuals[0].coords.vector[1];    alfa.fitness = individuals[0].fitness;
-            beta.coords.vector[0] = individuals[1].coords.vector[0];    beta.coords.vector[1] = individuals[1].coords.vector[1];    beta.fitness = individuals[1].fitness;
-            delta.coords.vector[0] = individuals[2].coords.vector[0];   delta.coords.vector[1] = individuals[2].coords.vector[1];   delta.fitness = individuals[2].fitness;
+            //Выбираем наиболее приспосоленного кита (сделано так, чтобы была передача значений, а не ссылки) 
+            best.coords.vector[0] = individuals[0].coords.vector[0];    best.coords.vector[1] = individuals[0].coords.vector[1];    best.fitness = individuals[0].fitness;
         }
 
         //Формирование новой стаи
@@ -98,25 +89,39 @@ namespace GWO
 
             for (int k = 0; k < population; k++)
             {
+                if (rand.NextDouble() < 0.5f)
+                {
+                    A_individual[0] = 2 * a * rand.NextDouble() - a;
+                    A_individual[1] = 2 * a * rand.NextDouble() - a;
 
-                A_alfa[0] = 2 * a * rand.NextDouble() - a;          A_alfa[1] =  2 * a * rand.NextDouble() - a;
-                A_beta[0] = 2 * a * rand.NextDouble() - a;          A_beta[1] =  2 * a * rand.NextDouble() - a;
-                A_delta[0] = 2 * a * rand.NextDouble() - a;         A_delta[1] = 2 * a * rand.NextDouble() - a;
+                    C_individual[0] = 2 * rand.NextDouble();
+                    C_individual[1] = 2 * rand.NextDouble();
 
-                C_alfa[0] = 2 * rand.NextDouble();                  C_alfa[1] = 2 * rand.NextDouble();
-                C_beta[0] = 2 * rand.NextDouble();                  C_beta[1] = 2 * rand.NextDouble();
-                C_delta[0] = 2 * rand.NextDouble();                 C_delta[1] = 2 * rand.NextDouble();
+                    if ((Math.Abs(A_individual[0]) < 1) && (Math.Abs(A_individual[1]) < 1))
+                    {
+                        Vector D_individual = Vector.Norm(Vector.HadamardMultiply(C_individual, best.coords) - individuals[k].coords);
+                        individuals[k].coords = ((best.coords - Vector.HadamardMultiply(D_individual, A_individual)));
+                    }
+                    else
+                    {
+                        Whale WhaleRand = individuals[rand.Next(0, population - 1)];
+                        Vector D_individual = Vector.Norm(Vector.HadamardMultiply(C_individual, WhaleRand.coords) - individuals[k].coords);
+                        individuals[k].coords = ((WhaleRand.coords - Vector.HadamardMultiply(D_individual, A_individual)));
+                    }
+                }
+                else
+                {
+                    Vector D_individual = Vector.Norm(best.coords - individuals[k].coords);
 
+                    double l1 = 2 * rand.NextDouble() - 1;
+                    double l2 = 2 * rand.NextDouble() - 1;
 
-                Vector D_alfa = Vector.Norm(Vector.HadamardMultiply(C_alfa, alfa.coords) - individuals[k].coords);
+                    double tmp1 = Math.Cos(2 * Math.PI * l1) * Math.Exp(b * l1);
+                    double tmp2 = Math.Cos(2 * Math.PI * l2) * Math.Exp(b * l2);
 
-                Vector D_beta = Vector.Norm(Vector.HadamardMultiply(C_beta, beta.coords) - individuals[k].coords);
-
-                Vector D_delta = Vector.Norm(Vector.HadamardMultiply(C_delta, delta.coords) - individuals[k].coords);
-
-                individuals[k].coords = ((alfa.coords - Vector.HadamardMultiply(D_alfa, A_alfa)) +
-                                             (beta.coords - Vector.HadamardMultiply(D_beta, A_beta)) +
-                                             (delta.coords - Vector.HadamardMultiply(D_delta, A_delta))) / 3.0;
+                    individuals[k].coords[0] = D_individual[0] * tmp1 + best.coords[0];
+                    individuals[k].coords[1] = D_individual[1] * tmp2 + best.coords[1];
+                }
 
                 double x = individuals[k].coords[0];
                 double y = individuals[k].coords[1];
@@ -136,13 +141,14 @@ namespace GWO
         }
 
         //Старт алгоритма
-        public Wolf FastStartAlg(int population, int MaxCount, double[,] D, int f, Params param) 
+        public Whale FastStartAlg(int population, int MaxCount, double b, double[,] D, int f, Params param) 
         {
             this.param = param;
             this.MaxCount = MaxCount;
             this.population = population;
             this.D = D;
             this.f = f;
+            this.b = b;
 
             FormingPopulation();
 
@@ -153,7 +159,7 @@ namespace GWO
                 currentIteration++;
             }
             Selection();
-            return alfa;
+            return best;
         }
         
         //Все тестовые функции

@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace GWO
+namespace WOA
 {
     public partial class FormStepByStep : Form
     {
-        public FormStepByStep(int z, double[,] obl, int PopulationCount, int MaxIteration, double exact)
+        public FormStepByStep(int z, double[,] obl, int PopulationCount, int MaxIteration, double b, double exact)
         {
             InitializeComponent();
             InitDataGridView();
@@ -18,10 +18,12 @@ namespace GWO
             this.exact = exact;
             this.PopulationCount = PopulationCount;
             this.MaxIteration = MaxIteration;
+            this.b = b;
         }
 
         private int PopulationCount;
         private int MaxIteration;
+        private double b = 0;
         public double exact;
         public Algoritm algst = new Algoritm();
 
@@ -51,8 +53,8 @@ namespace GWO
             dataGridViewIterationInfo.Rows[0].Cells[0].Value = "Номер популяции:";
             dataGridViewIterationInfo.Rows[1].Cells[0].Value = "Размер популяции:";
             dataGridViewIterationInfo.Rows[2].Cells[0].Value = "Количество итераций:";
-            dataGridViewIterationInfo.Rows[3].Cells[0].Value = "Волк с лучшей приспособленностью:";
-            dataGridViewIterationInfo.Rows[4].Cells[0].Value = "Приспособленность лучшего волка:";
+            dataGridViewIterationInfo.Rows[3].Cells[0].Value = "Кит с лучшей приспособленностью:";
+            dataGridViewIterationInfo.Rows[4].Cells[0].Value = "Приспособленность лучшего кита:";
             dataGridViewIterationInfo.Rows[5].Cells[0].Value = "Средняя приспособленность популяции:";
         }
 
@@ -146,10 +148,11 @@ namespace GWO
                 algst = new Algoritm
                 {
                     MaxCount = MaxIteration,
-                    population = PopulationCount,
+                    population = PopulationCount, 
                     f = z,
                     D = obl
                 };
+                algst.b = b;
 
                 algst.FormingPopulation();
 
@@ -284,8 +287,6 @@ namespace GWO
 
             if((Red[1] == true)||(Red[2] == true)||(Red[3] == true))
             {
-                e.Graphics.DrawEllipse(p12, (float)((algst.individuals[1].coords.vector[0] * k - x1) * w / (x2 - x1) - 3) - 7, (float)(h - (algst.individuals[1].coords.vector[1] * k - y1) * h / (y2 - y1) - 3) - 7, 20, 20);
-                e.Graphics.DrawEllipse(p13, (float)((algst.individuals[2].coords.vector[0] * k - x1) * w / (x2 - x1) - 3) - 7, (float)(h - (algst.individuals[2].coords.vector[1] * k - y1) * h / (y2 - y1) - 3) - 7, 20, 20);
                 e.Graphics.DrawEllipse(p14, (float)((algst.individuals[0].coords.vector[0] * k - x1) * w / (x2 - x1) - 2) - 7, (float)(h - (algst.individuals[0].coords.vector[1] * k - y1) * h / (y2 - y1) - 2) - 7, 20, 20);
             }
 
@@ -403,7 +404,7 @@ namespace GWO
                     
                 //селекция
                 algst.Selection();
-                algst.bestFitness.Add(algst.alfa.fitness);
+                algst.bestFitness.Add(algst.best.fitness);
                 algst.AverageFitness();
                 UpdateIterationInfo();
 
@@ -416,17 +417,17 @@ namespace GWO
         private void UpdateIterationInfo()
         {
             dataGridViewIterationInfo.Rows[0].Cells[1].Value = String.Format($"{algst.currentIteration}");
-            dataGridViewIterationInfo.Rows[3].Cells[1].Value = String.Format($"{algst.alfa.coords.vector[0]:F2}   {algst.alfa.coords.vector[1]:F2}");
-            dataGridViewIterationInfo.Rows[4].Cells[1].Value = String.Format($"{algst.alfa.fitness:F2}");
+            dataGridViewIterationInfo.Rows[3].Cells[1].Value = String.Format($"{algst.best.coords.vector[0]:F2}   {algst.best.coords.vector[1]:F2}");
+            dataGridViewIterationInfo.Rows[4].Cells[1].Value = String.Format($"{algst.best.fitness:F2}");
             dataGridViewIterationInfo.Rows[5].Cells[1].Value = String.Format($"{algst.averageFitness[algst.averageFitness.Count - 1]:F7}");
             dataGridViewIterationInfo.Refresh();
         }
 
         private void UpdateAnswer()
         {
-            dataGridViewAnswer.Rows[0].Cells[1].Value = string.Format($"{algst.alfa.coords[0]:F8}");
-            dataGridViewAnswer.Rows[1].Cells[1].Value = string.Format($"{algst.alfa.coords[1]:F8}");
-            dataGridViewAnswer.Rows[2].Cells[1].Value = string.Format($"{algst.alfa.fitness:F8}");
+            dataGridViewAnswer.Rows[0].Cells[1].Value = string.Format($"{algst.best.coords[0]:F8}");
+            dataGridViewAnswer.Rows[1].Cells[1].Value = string.Format($"{algst.best.coords[1]:F8}");
+            dataGridViewAnswer.Rows[2].Cells[1].Value = string.Format($"{algst.best.fitness:F8}");
         }
 
         private void buttonEndVerify_Click(object sender, EventArgs e)
@@ -480,7 +481,7 @@ namespace GWO
                     algst.NewPackGeneration();
 
                     algst.AverageFitness();
-                    algst.bestFitness.Add(algst.alfa.fitness);
+                    algst.bestFitness.Add(algst.best.fitness);
                     algst.currentIteration++;
 
                     UpdateIterationInfo();
@@ -570,13 +571,12 @@ namespace GWO
                 if (flag == true)
                 {
                     e.Graphics.FillEllipse(Brushes.Green, (float)(x0), (float)(y0 - 1 - mh * (algst.averageFitness[0] - Math.Min(0, algst.averageFitness[0]))), 3, 3);
-                    e.Graphics.FillEllipse(Brushes.Blue, (float)(x0), (float)(y0 - 1 - mh * (algst.alfa.coords[0] - Math.Min(0, algst.averageFitness[0]))), 3, 3);
+                    e.Graphics.FillEllipse(Brushes.Blue, (float)(x0), (float)(y0 - 1 - mh * (algst.best.coords[0] - Math.Min(0, algst.averageFitness[0]))), 3, 3);
 
 
                     if (algst.bestFitness.Count >= 2 && algst.averageFitness.Count >= 2)
                     for (int i = 0; i < algst.averageFitness.Count - 1; i++)
                     {
-
                         {
                             e.Graphics.DrawLine(p2, (float)(x0 + mx * i), (float)(y0 - mh * (algst.averageFitness[i] - Math.Min(0, algst.averageFitness[0]))), (float)(x0 + mx * (i + 1)), (float)(y0 - mh * (algst.averageFitness[i + 1] - Math.Min(0, algst.averageFitness[0]))));
                             e.Graphics.DrawLine(p3, (float)(x0 + mx * i), (float)(y0 - mh * (algst.bestFitness[i] - Math.Min(0, algst.averageFitness[0]))), (float)(x0 + mx * (i + 1)), (float)(y0 - mh * (algst.bestFitness[i + 1] - Math.Min(0, algst.averageFitness[0]))));
@@ -607,7 +607,7 @@ namespace GWO
                     algst.Selection();
                     algst.NewPackGeneration();
 
-                    algst.bestFitness.Add(algst.alfa.fitness);
+                    algst.bestFitness.Add(algst.best.fitness);
                     algst.AverageFitness();
 
                     algst.currentIteration++;

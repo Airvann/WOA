@@ -1,4 +1,4 @@
-﻿namespace GWO
+﻿namespace WOA
 {
     partial class FormStepByStep
     {
@@ -82,7 +82,7 @@
             this.buttonMove.Name = "buttonMove";
             this.buttonMove.Size = new System.Drawing.Size(135, 75);
             this.buttonMove.TabIndex = 10;
-            this.buttonMove.Text = "Найти новые положения волков \r\nв стае";
+            this.buttonMove.Text = "Найти новые положения китов \r\nв стае";
             this.buttonMove.UseVisualStyleBackColor = true;
             this.buttonMove.Click += new System.EventHandler(this.buttonMove_Click);
             // 
@@ -93,7 +93,7 @@
             this.buttonBest.Name = "buttonBest";
             this.buttonBest.Size = new System.Drawing.Size(135, 75);
             this.buttonBest.TabIndex = 12;
-            this.buttonBest.Text = "Найти трех волков-лидеров\r\nв популяции";
+            this.buttonBest.Text = "Найти лидера \nв популяции китов";
             this.buttonBest.UseVisualStyleBackColor = true;
             this.buttonBest.Click += new System.EventHandler(this.buttonBest_Click);
             // 
@@ -316,8 +316,8 @@
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(490, 37);
             this.label3.TabIndex = 0;
-            this.label3.Text = "Красная, желтая и зеленая окружности на графике соответствуют первому, второму и " +
-    "третьему значению по величине функции на текущей итерации.";
+            this.label3.Text = "Красная окружность на графике соответствуют лучшему значению по величине функции " +
+    "на текущей итерации.";
             this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // FormStepByStep
@@ -342,7 +342,7 @@
             this.Controls.Add(this.pictureBox1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "FormStepByStep";
-            this.Text = "Метод серых волков. Работа по шагам";
+            this.Text = "Метод горбатых китов. Работа по шагам";
             this.groupBox1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewAnswer)).EndInit();
             this.groupBox2.ResumeLayout(false);

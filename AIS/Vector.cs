@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GWO
+namespace WOA
 {
     public class Vector
     {
@@ -52,6 +52,19 @@ namespace GWO
             tmp[0] = vec1[0] + vec2[0];
             tmp[1] = vec1[1] + vec2[1];
             return tmp;
+        }
+
+        public static Vector operator +(Vector vec1, double val)
+        {
+            Vector tmp = new Vector();
+            tmp[0] = vec1[0] + val;
+            tmp[1] = vec1[1] + val;
+            return tmp;
+        }
+
+        public static Vector operator +(double val, Vector vec1)
+        {
+            return vec1 + val;
         }
         public static Vector operator /(Vector vec1, double val)
         {

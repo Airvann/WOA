@@ -6,13 +6,14 @@ using System.Diagnostics;
 using System.Windows.Forms;
 using System.IO;
 
-namespace GWO
+namespace WOA
 {
     public partial class FormMain : Form
     {
         private Algoritm alg;
         private int population = 0;
         private int MaxIteration = 0;
+        private double b = 0;
         private double[,] obl = new double[2, 2];
         private List<Vector> exactPoints;
 
@@ -54,11 +55,13 @@ namespace GWO
             dataGridView1.Rows[0].Cells[0].Value = "x";
             dataGridView1.Rows[1].Cells[0].Value = "y";
 
-            dataGridView2.RowCount = 2;
+            dataGridView2.RowCount = 3;
             dataGridView2.Rows[0].Cells[0].Value = "Размер начальной популяции";
             dataGridView2.Rows[1].Cells[0].Value = "Максимальное количество итераций";
             dataGridView2.Rows[0].Cells[1].Value = 100;
             dataGridView2.Rows[1].Cells[1].Value = 100;
+            dataGridView2.Rows[2].Cells[0].Value = "Параметр логарифмической спирали";
+            dataGridView2.Rows[2].Cells[1].Value = 2;
 
             dataGridView3.RowCount = 3;
             dataGridView3.Columns[0].DefaultCellStyle.Font = new Font("Times new roman", 12, FontStyle.Italic);
@@ -72,7 +75,7 @@ namespace GWO
             if( dataGridView1.Rows[0].Cells[1].Value != null  &&
                 dataGridView1.Rows[0].Cells[2].Value != null  &&
                 dataGridView1.Rows[1].Cells[1].Value != null  &&
-                dataGridView1.Rows[1].Cells[2].Value!= null)
+                dataGridView1.Rows[1].Cells[2].Value!= null)   
             {
                 //создать начальную популяцию
                 if ((comboBox1.SelectedIndex != -1) && (comboBoxSelectParams.SelectedIndex != -1))
@@ -86,10 +89,11 @@ namespace GWO
 
                     population = Convert.ToInt32(dataGridView2.Rows[0].Cells[1].Value);
                     MaxIteration = Convert.ToInt32(dataGridView2.Rows[1].Cells[1].Value);
+                    b = Convert.ToDouble(dataGridView2.Rows[2].Cells[1].Value);
                     Params param = (comboBoxSelectParams.SelectedIndex == 0) ? Params.Linear : Params.Quadratic;
                     alg = new Algoritm();
 
-                    Wolf result = alg.FastStartAlg(population, MaxIteration, obl, z, param);
+                    Whale result = alg.FastStartAlg(population, MaxIteration, b, obl, z, param);
                     dataGridView3.Rows[0].Cells[1].Value = string.Format($"{result.coords[0]:F8}");
                     dataGridView3.Rows[1].Cells[1].Value = string.Format($"{result.coords[1]:F8}");
                     dataGridView3.Rows[2].Cells[1].Value = string.Format($"{result.fitness:F8}");
@@ -407,7 +411,7 @@ namespace GWO
                             for (int i = 0; i < (int)alg.population; i++)
                                 e.Graphics.FillEllipse(Brushes.Blue, (float)((alg.individuals[i].coords.vector[0] * k - x1) * w / (x2 - x1) - 3), (float)(h - (alg.individuals[i].coords.vector[1] * k - y1) * h / (y2 - y1) - 3), 6, 6);                            
                     
-                            e.Graphics.FillEllipse(Brushes.Red, (float)((alg.alfa.coords.vector[0] * k - x1) * w / (x2 - x1) - 4), (float)(h - (alg.alfa.coords.vector[1] * k - y1) * h / (y2 - y1) - 4), 8, 8);
+                            e.Graphics.FillEllipse(Brushes.Red, (float)((alg.best.coords.vector[0] * k - x1) * w / (x2 - x1) - 4), (float)(h - (alg.best.coords.vector[1] * k - y1) * h / (y2 - y1) - 4), 8, 8);
                         }                        
 
                         //отрисовка Осей
@@ -492,8 +496,9 @@ namespace GWO
 
                 population = Convert.ToInt32(dataGridView2.Rows[0].Cells[1].Value);
                 MaxIteration = Convert.ToInt32(dataGridView2.Rows[1].Cells[1].Value);
+                b = Convert.ToDouble(dataGridView2.Rows[2].Cells[1].Value);
 
-                FormStepByStep form = new FormStepByStep(comboBox1.SelectedIndex, obl, population, MaxIteration, exact)
+                FormStepByStep form = new FormStepByStep(comboBox1.SelectedIndex, obl, population, MaxIteration, b, exact)
                 {
                     flines = flines,
                     showobl = showobl,
@@ -568,7 +573,7 @@ namespace GWO
                     for (int i = 0; i < 100; i++)
                     {
                         alg = new Algoritm();
-                        Wolf result = alg.FastStartAlg(population, MaxIteration, obl, z, param);
+                        Whale result = alg.FastStartAlg(population, MaxIteration, b, obl, z, param);
 
                         foreach (Vector item in exactPoints)
                         {
@@ -614,6 +619,11 @@ namespace GWO
         {
             if (File.Exists("protocol.txt"))
                 File.Delete("protocol.txt");
+        }
+
+        private void FormMain_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }
