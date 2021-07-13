@@ -16,7 +16,7 @@ namespace WOA
     {
         public Params param;
 
-        //Рандом
+        //Генератор псевдослучайных чисел
         private Random rand = new Random();
 
         //Размер популяции волков
@@ -35,7 +35,7 @@ namespace WOA
         public int currentIteration = 0;
 
         //3 наиболее приспособленные особи
-        public Whale best = new Whale();  //Альфа-особь
+        public Whale best = new Whale();        
         public Vector A_individual = new Vector();
         public Vector C_individual = new Vector();
         //Массив средней приспособленности
@@ -64,8 +64,8 @@ namespace WOA
                 double x = rand.NextDouble();
                 double y = rand.NextDouble();
 
-                x = (Math.Abs(D[0, 0]) + Math.Abs(D[0, 1])) * x - Math.Abs(D[0, 0]);
-                y = (Math.Abs(D[1, 0]) + Math.Abs(D[1, 1])) * y - Math.Abs(D[1, 0]);
+                x = ((Math.Abs(D[0, 0]) + Math.Abs(D[0, 1])) * x - Math.Abs(D[0, 0]));
+                y = ((Math.Abs(D[1, 0]) + Math.Abs(D[1, 1])) * y - Math.Abs(D[1, 0]));
 
                 Whale Whale = new Whale(x, y, function(x, y, f));
                 individuals.Add(Whale);
@@ -75,7 +75,7 @@ namespace WOA
         {
             individuals = individuals.OrderByDescending(s => s.fitness).ToList();
             //Выбираем наиболее приспосоленного кита (сделано так, чтобы была передача значений, а не ссылки) 
-            best.coords.vector[0] = individuals[0].coords.vector[0];    best.coords.vector[1] = individuals[0].coords.vector[1];    best.fitness = individuals[0].fitness;
+            best.coords[0] = individuals[0].coords[0];    best.coords[1] = individuals[0].coords[1];    best.fitness = individuals[0].fitness;
         }
 
         //Формирование новой стаи
@@ -87,37 +87,38 @@ namespace WOA
             else
                 a = 2 * (1 - currentIteration / (double)(MaxCount));
 
+            Vector l = new Vector();
+            Vector D_individual = new Vector();
             for (int k = 0; k < population; k++)
             {
                 if (rand.NextDouble() < 0.5f)
                 {
                     A_individual[0] = 2 * a * rand.NextDouble() - a;
                     A_individual[1] = 2 * a * rand.NextDouble() - a;
-
+                    
                     C_individual[0] = 2 * rand.NextDouble();
                     C_individual[1] = 2 * rand.NextDouble();
 
                     if ((Math.Abs(A_individual[0]) < 1) && (Math.Abs(A_individual[1]) < 1))
                     {
-                        Vector D_individual = Vector.Norm(Vector.HadamardMultiply(C_individual, best.coords) - individuals[k].coords);
+                        D_individual = Vector.Norm(Vector.HadamardMultiply(C_individual, best.coords) - individuals[k].coords);
                         individuals[k].coords = ((best.coords - Vector.HadamardMultiply(D_individual, A_individual)));
                     }
                     else
                     {
                         Whale WhaleRand = individuals[rand.Next(0, population - 1)];
-                        Vector D_individual = Vector.Norm(Vector.HadamardMultiply(C_individual, WhaleRand.coords) - individuals[k].coords);
+                        D_individual = Vector.Norm(Vector.HadamardMultiply(C_individual, WhaleRand.coords) - individuals[k].coords);
                         individuals[k].coords = ((WhaleRand.coords - Vector.HadamardMultiply(D_individual, A_individual)));
                     }
                 }
                 else
                 {
-                    Vector D_individual = Vector.Norm(best.coords - individuals[k].coords);
+                    D_individual = Vector.Norm(best.coords - individuals[k].coords);
+                    l[0] = 2 * rand.NextDouble() - 1;
+                    l[1] = 2 * rand.NextDouble() - 1;
 
-                    double l1 = 2 * rand.NextDouble() - 1;
-                    double l2 = 2 * rand.NextDouble() - 1;
-
-                    double tmp1 = Math.Cos(2 * Math.PI * l1) * Math.Exp(b * l1);
-                    double tmp2 = Math.Cos(2 * Math.PI * l2) * Math.Exp(b * l2);
+                    double tmp1 = Math.Cos(2 * Math.PI * l[0]) * Math.Exp(b * l[0]);
+                    double tmp2 = Math.Cos(2 * Math.PI * l[1]) * Math.Exp(b * l[1]);
 
                     individuals[k].coords[0] = D_individual[0] * tmp1 + best.coords[0];
                     individuals[k].coords[1] = D_individual[1] * tmp2 + best.coords[1];
@@ -135,7 +136,6 @@ namespace WOA
                     individuals[k].coords[1] = D[1, 0];
                 if (y > D[1, 1])
                     individuals[k].coords[1] = D[1, 1];
-
                 individuals[k].fitness = function(individuals[k].coords[0], individuals[k].coords[1], f);
             }
         }

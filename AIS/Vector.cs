@@ -22,6 +22,11 @@ namespace WOA
             return tmp;
         }
 
+        public static Vector HadamardMultiply(double value, Vector vector)
+        {
+            return HadamardMultiply(vector, value);
+        }
+
         public static Vector HadamardMultiply(Vector vector1, Vector vector2)
         {
             Vector tmp = new Vector();
