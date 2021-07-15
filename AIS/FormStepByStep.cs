@@ -282,7 +282,9 @@ namespace WOA
             {
                 for (int i = 0; i < algst.population; i++)
                     e.Graphics.FillEllipse(Brushes.Blue, (float)((algst.individuals[i].coords.vector[0] * k - x1) * w / (x2 - x1) - 3), (float)(h - (algst.individuals[i].coords.vector[1] * k - y1) * h / (y2 - y1) - 3), 6, 6);
-                e.Graphics.FillEllipse(Brushes.Red, (float)((algst.individuals[0].coords.vector[0] * k - x1) * w / (x2 - x1) - 3), (float)(h - (algst.individuals[0].coords.vector[1] * k - y1) * h / (y2 - y1) - 3), 8, 8);
+
+                if (Red[0] != true)
+                    e.Graphics.FillEllipse(Brushes.Red, (float)((algst.individuals[0].coords.vector[0] * k - x1) * w / (x2 - x1) - 3), (float)(h - (algst.individuals[0].coords.vector[1] * k - y1) * h / (y2 - y1) - 3), 8, 8);
             }
 
             if((Red[1] == true)||(Red[2] == true)||(Red[3] == true))
